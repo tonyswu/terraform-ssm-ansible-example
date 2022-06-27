@@ -1,0 +1,2 @@
+---
+- debug: msg='Current account alias {{ aws_account_alias }}'

@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  become: yes
+  connection: local
+  pre_tasks:
+    - name: Ensure log directory exists
+      file: path="/var/log/ansible" state=directory
+
+    - name: Install prerequisites
+      yum: name=logrotate state=latest
+
+    - name: Configure ansible.cfg
+      copy:
+        content: |
+          [defaults]
+          log_path = /var/log/ansible/localhost.log
+        dest: /etc/ansible/ansible.cfg
+
+    - name: Configure logrotate for /var/log/ansible/localhost.log
+      copy:
+        content: |
+          /var/log/ansible/localhost.log {
+            copytruncate
+            daily
+            missingok
+            rotate 7
+            compress
+            delaycompress
+            notifempty
+            create 644 root root
+          }
+        dest: /etc/logrotate.d/ansible-localhost
+  tasks:
+    - include_role:
+        name: ssm-example

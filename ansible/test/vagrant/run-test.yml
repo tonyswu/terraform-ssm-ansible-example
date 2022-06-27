@@ -1,0 +1,56 @@
+---
+- hosts: all
+  become: yes
+  vars:
+  pre_tasks:
+    - name: Create temporary directory
+      tempfile:
+        state: directory
+      become: no
+      delegate_to: localhost
+      register: temp_directory
+
+    - name: Ensure Ansible directories exist
+      file: path="{{ item }}" state=directory
+      with_items:
+        - '/etc/ansible'
+        - '/var/log/ansible'
+
+    - name: Configure Ansible logging
+      copy:
+        content: |
+          [defaults]
+          log_path = /var/log/ansible/localhost.log
+        dest: /etc/ansible/ansible.cfg
+
+    - name: Install prerequisites
+      yum:
+        name:
+          - at
+          - unzip
+        state: latest
+
+    - archive:
+        path: ../../playbook
+        dest: "{{ temp_directory.path }}/playbook.zip"
+        format: zip
+      become: no
+      delegate_to: localhost
+
+    - name: Copy playbook
+      copy:
+        src: "{{ temp_directory.path }}/playbook.zip"
+        dest: "/etc/ansible"
+
+    - name: Unarchive playbook
+      unarchive:
+        src: /etc/ansible/playbook.zip
+        dest: /etc/ansible
+        remote_src: yes
+
+    - name: Cleanup temporary directory
+      file: path="{{ temp_directory.path }}" state=absent
+  tasks:
+    - shell: >
+        echo "ansible-playbook /etc/ansible/playbook/ssm-example.yml
+        -e aws_account_alias=localtest" | at -t $(date --date="now +10 seconds" +"%Y%m%d%H%M.%S")

@@ -39,7 +39,7 @@
             ansible_distribution != "Fedora"
 
     - name: INIT | Install ansible
-      pip:
+      package:
         name: "ansible"
         state: latest
 

@@ -30,6 +30,16 @@
             create 644 root root
           }
         dest: /etc/logrotate.d/ansible-localhost
+
+    - name: Download Ansible var file
+      aws_s3:
+        bucket: '{{ ansible_vars_s3_bucket }}'
+        object: '{{ ansible_vars_path }}'
+        dest: /etc/ansible/ansible_vars.yml
+        mode: get
+      when: aws_account_alias != 'localtest'
   tasks:
+    - include_vars: /etc/ansible/ansible_vars.yml
+
     - include_role:
         name: ssm-example

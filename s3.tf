@@ -62,3 +62,17 @@ resource "aws_s3_object" "ansible_playbook" {
 
   etag = data.archive_file.ansible_playbook.output_md5
 }
+
+locals {
+  ansible_vars = <<-EOT
+  var_file_example: 'vars_from_file'
+  EOT
+}
+
+resource "aws_s3_object" "ansible_vars" {
+  bucket  = aws_s3_bucket.ssm_example.id
+  key     = "ansible_vars.yml"
+  content = local.ansible_vars
+
+  etag = md5(local.ansible_vars)
+}

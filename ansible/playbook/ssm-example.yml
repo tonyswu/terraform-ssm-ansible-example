@@ -31,7 +31,7 @@
           }
         dest: /etc/logrotate.d/ansible-localhost
 
-    - name: Simple GET operation
+    - name: Download Ansible var file
       aws_s3:
         bucket: '{{ ansible_vars_s3_bucket }}'
         object: '{{ ansible_vars_path }}'

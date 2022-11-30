@@ -1,2 +1,4 @@
 ---
 - debug: msg='Current account alias {{ aws_account_alias }}'
+
+- debug: msg='var_file_example = {{ var_file_example }}'

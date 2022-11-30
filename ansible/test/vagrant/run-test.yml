@@ -48,6 +48,11 @@
         dest: /etc/ansible
         remote_src: yes
 
+    - name: Setup ansible vars file for local test
+      copy:
+        content: "var_file_example: 'localtest'"
+        dest: /etc/ansible/ansible_vars.yml
+
     - name: Cleanup temporary directory
       file: path="{{ temp_directory.path }}" state=absent
   tasks:
